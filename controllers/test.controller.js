@@ -1,27 +1,48 @@
-// backend/controllers/testController.js
 import Test from "../models/test.model.js";
 import User from "../models/users.model.js";
-import AptitudeQuestion from "../models/aptitudeQuestions.model.js";
+import CodingQuestion from "../models/aptitudeQuestions.model.js";
 
 const startTest = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // Get total number of questions in DB
-    const totalQuestionsInDB = await AptitudeQuestion.countDocuments();
-    const sampleSize = Math.min(20, totalQuestionsInDB);
+    // ── GATE 1: Check if user is blocked ──────────────────────────────────
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    const questions = await AptitudeQuestion.aggregate([
-      { $sample: { size: sampleSize } },
-    ]);
+    if (user.isBlocked) {
+      return res.status(403).json({
+        message: "Your account is blocked due to suspicious activity.",
+        reason: user.blockedReason,
+      });
+    }
+
+    // ── GATE 2: Check if user already attempted ───────────────────────────
+    if (user.hasAttemptedTest) {
+      return res.status(403).json({
+        message: "You have already attempted this test. Multiple attempts are not allowed.",
+      });
+    }
+
+    // ── All clear: fetch questions and create test ────────────────────────
+    const questions = await CodingQuestion.find()
+      .limit(10)
+      .select("-testCases"); // hide test cases from student
+
+    if (!questions.length) {
+      return res.status(404).json({ message: "No questions found. Please contact admin." });
+    }
 
     const test = await Test.create({
       userId,
       answers: [],
-      totalQuestions: sampleSize,
+      totalQuestions: questions.length,
       startedAt: new Date(),
     });
 
+    // Mark attempted AFTER test is successfully created
     await User.findByIdAndUpdate(userId, { hasAttemptedTest: true });
 
     res.json({
@@ -39,44 +60,30 @@ const submitTest = async (req, res) => {
     const { answers, wasCheating, cheatingReason } = req.body;
     const userId = req.userId;
 
-    let score = 0;
-
-    // Calculate score by checking against correct answers from DB
-    for (const ans of answers) {
-      const question = await AptitudeQuestion.findById(ans.questionId);
-      if (question && ans.selectedIndex === question.answerIndex) {
-        score++;
-      }
-    }
-
-    // Find the latest test for this user that hasn't been submitted yet
     const test = await Test.findOne({
       userId,
       endedAt: { $exists: false },
     }).sort({ createdAt: -1 });
 
     if (!test) {
-      return res
-        .status(404)
-        .json({ message: "No active test found for this user" });
+      return res.status(404).json({ message: "No active test found for this user" });
     }
 
-    // IMPORTANT: Keep the original totalQuestions from startTest, don't overwrite with answers.length
-    // This ensures correct count of unanswered questions in admin panel
-    const updateData = {
+    const attemptedCount = answers.filter(
+      (a) => a.codeSubmitted?.trim().length > 0
+    ).length;
+
+    await Test.findByIdAndUpdate(test._id, {
       answers,
-      score,
-      // DON'T change totalQuestions - keep the original value set in startTest
+      score: attemptedCount,
       endedAt: new Date(),
       isCheating: wasCheating || false,
       cheatingReason: cheatingReason || "",
-    };
-
-    await Test.findByIdAndUpdate(test._id, updateData);
+    });
 
     res.json({
       message: "Test submitted",
-      score,
+      attempted: attemptedCount,
       isCheating: wasCheating || false,
     });
   } catch (err) {
@@ -87,13 +94,12 @@ const submitTest = async (req, res) => {
 const status = async (req, res) => {
   try {
     const userId = req.userId;
-    const user = await User.findById(userId).select(
-      "hasAttemptedTest isBlocked"
-    );
+    const user = await User.findById(userId).select("hasAttemptedTest isBlocked blockedReason");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({
       hasAttempted: !!user.hasAttemptedTest,
-      isBlocked: !!user.isBlocked,
+      isBlocked:    !!user.isBlocked,
+      blockedReason: user.blockedReason || "",
     });
   } catch (err) {
     res.status(500).json({ message: "status error", error: err.message });

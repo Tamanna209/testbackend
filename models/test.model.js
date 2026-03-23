@@ -8,13 +8,14 @@ const TestSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    answers: [
-      {
-        questionId: mongoose.Schema.Types.ObjectId,
-        selectedIndex: Number,
-        isCorrect: Boolean,
-      },
-    ],
+  answers: [
+  {
+    questionId:    mongoose.Schema.Types.ObjectId,
+    codeSubmitted: { type: String, default: "" },
+    language:      { type: String, default: "javascript" },
+    attemptedAt:   Date,
+  },
+],
     score: { type: Number, default: 0 },
     totalQuestions: { type: Number, default: 20 },
     isCancelled: { type: Boolean, default: false },
