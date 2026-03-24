@@ -4,7 +4,13 @@ import AptitudeQuestion from "../models/aptitudeQuestions.model.js";
 const addQuestion = async (req, res) => {
   try {
     const { title, description, testCases, tags, difficulty } = req.body;
-    await AptitudeQuestion.create({ title, description, testCases, tags, difficulty });
+    await AptitudeQuestion.create({
+      title,
+      description,
+      testCases,
+      tags,
+      difficulty,
+    });
     res.json({ message: "Question added" });
   } catch (err) {
     res.status(500).json({ message: "Add question error", error: err.message });
@@ -20,318 +26,236 @@ const seedQuestions = async (req, res) => {
   await AptitudeQuestion.deleteMany({});
 
   const problems = [
+    // ADD THESE INTO THE problems array alongside existing questions
+
     {
-      title: "Reverse a String",
-      description: `Write a function reverseString(str) that takes a string and returns it reversed.
+      title: "Build a Pagination Helper",
+      description: `Write a function paginate(array, pageSize, pageNumber) that takes an array of items and returns the correct slice for that page. Page numbers start at 1.
 
 Example:
-  Input:  "hello"
-  Output: "olleh"
+  Input:  ([1,2,3,4,5,6,7,8,9,10], 3, 2)
+  Output: [4, 5, 6]
 
-  Input:  "JavaScript"
-  Output: "tpircSavaJ"`,
+  Input:  ([1,2,3,4,5], 2, 3)
+  Output: [5]
+
+  Input:  ([1,2,3], 3, 1)
+  Output: [1, 2, 3]`,
       difficulty: "easy",
-      tags: ["string", "basics"],
+      tags: ["array", "logic", "backend"],
     },
     {
-      title: "FizzBuzz",
-      description: `Write a function fizzBuzz(n) that returns an array of strings from 1 to n where:
-- Multiples of 3 → "Fizz"
-- Multiples of 5 → "Buzz"
-- Multiples of both → "FizzBuzz"
-- Otherwise → the number as a string
+      title: "Group Array of Objects by Key",
+      description: `Write a function groupBy(arr, key) that groups an array of objects by a given key and returns an object where each key maps to an array of matching items.
 
 Example:
-  Input:  15
-  Output: ["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]`,
-      difficulty: "easy",
-      tags: ["loops", "basics"],
-    },
-    {
-      title: "Find Duplicates in Array",
-      description: `Write a function findDuplicates(arr) that takes an array of integers and returns an array of all duplicate values (values that appear more than once). Return each duplicate only once, in any order.
-
-Example:
-  Input:  [1, 2, 3, 2, 4, 3, 5]
-  Output: [2, 3]
-
-  Input:  [1, 1, 1, 2]
-  Output: [1]`,
-      difficulty: "easy",
-      tags: ["array", "hashmap"],
-    },
-    {
-      title: "Flatten Nested Array",
-      description: `Write a function flattenArray(arr) that takes a deeply nested array and returns a single flat array.
-
-Example:
-  Input:  [1, [2, [3, [4]], 5]]
-  Output: [1, 2, 3, 4, 5]
-
-  Input:  [[1, 2], [3, [4, 5]]]
-  Output: [1, 2, 3, 4, 5]
-
-Note: Do not use Array.prototype.flat().`,
-      difficulty: "easy",
-      tags: ["array", "recursion"],
-    },
-    {
-      title: "Count Word Frequency",
-      description: `Write a function wordFrequency(sentence) that takes a string sentence and returns an object where each key is a word and its value is how many times it appears. Ignore case (treat "Hello" and "hello" as the same word).
-
-Example:
-  Input:  "the cat sat on the mat the cat"
-  Output: { the: 3, cat: 2, sat: 1, on: 1, mat: 1 }`,
-      difficulty: "easy",
-      tags: ["string", "hashmap"],
-    },
-    {
-      title: "Two Sum",
-      description: `Write a function twoSum(nums, target) that takes an array of integers and a target integer. Return the indices of the two numbers that add up to the target. You may assume exactly one solution exists and you cannot use the same element twice.
-
-Example:
-  Input:  nums = [2, 7, 11, 15], target = 9
-  Output: [0, 1]   // because nums[0] + nums[1] = 2 + 7 = 9
-
-  Input:  nums = [3, 2, 4], target = 6
-  Output: [1, 2]`,
-      difficulty: "medium",
-      tags: ["array", "hashmap"],
-    },
-    {
-      title: "Validate Balanced Brackets",
-      description: `Write a function isBalanced(str) that takes a string containing only the characters '(', ')', '{', '}', '[', ']' and returns true if the brackets are balanced and properly nested, false otherwise.
-
-Example:
-  Input:  "()[]{}"   → true
-  Input:  "([{}])"   → true
-  Input:  "(]"       → false
-  Input:  "([)]"     → false
-  Input:  "{"        → false`,
-      difficulty: "medium",
-      tags: ["stack", "string"],
-    },
-    {
-      title: "Deep Clone an Object",
-      description: `Write a function deepClone(obj) that creates and returns a deep copy of a plain JavaScript object or array. Changing the cloned object must NOT affect the original.
-
-Example:
-  const original = { a: 1, b: { c: 2 } };
-  const clone = deepClone(original);
-  clone.b.c = 99;
-  console.log(original.b.c); // still 2
-
-Note: Do not use JSON.parse/JSON.stringify or structuredClone.`,
-      difficulty: "medium",
-      tags: ["object", "recursion"],
-    },
-    {
-      title: "Promise Sequential Executor",
-      description: `Write a function runSequential(tasks) where tasks is an array of functions that each return a Promise. Execute them one after another (not in parallel) and return a Promise that resolves to an array of all results in order.
-
-Example:
-  const tasks = [
-    () => Promise.resolve(1),
-    () => Promise.resolve(2),
-    () => Promise.resolve(3),
+  const users = [
+    { name: "Alice", role: "admin" },
+    { name: "Bob",   role: "user"  },
+    { name: "Carol", role: "admin" },
   ];
-  runSequential(tasks).then(console.log); // [1, 2, 3]
-
-Note: Do not use Promise.all — tasks must run one at a time.`,
-      difficulty: "medium",
-      tags: ["async", "promise"],
+  groupBy(users, "role");
+  // {
+  //   admin: [{ name: "Alice", role: "admin" }, { name: "Carol", role: "admin" }],
+  //   user:  [{ name: "Bob", role: "user" }]
+  // }`,
+      difficulty: "easy",
+      tags: ["array", "object", "logic"],
     },
     {
-      title: "Debounce Function",
-      description: `Implement a debounce(fn, delay) function. It should return a new function that, when called repeatedly, only executes fn after it has NOT been called for delay milliseconds.
+      title: "Mongoose-style Query Filter",
+      description: `Write a function filterDocuments(docs, query) that filters an array of plain JS objects using a MongoDB-style query object. Support these operators: $eq, $gt, $lt, $gte, $lte, $ne.
 
 Example:
-  const log = debounce((msg) => console.log(msg), 300);
-  log("a");  // called at 0ms
-  log("b");  // called at 100ms
-  log("c");  // called at 200ms
-  // Only "c" is logged — at 500ms (200 + 300)
-
-This is used in search bars, resize handlers, etc.`,
-      difficulty: "medium",
-      tags: ["closure", "timing", "frontend"],
-    },
-    {
-      title: "Throttle Function",
-      description: `Implement a throttle(fn, limit) function. It should return a new function that, no matter how often it is called, only executes fn at most once every limit milliseconds.
-
-Example:
-  const log = throttle(() => console.log("fired"), 1000);
-  log(); // fires immediately
-  log(); // ignored (within 1000ms)
-  log(); // ignored
-  // after 1000ms:
-  log(); // fires again
-
-Used in scroll listeners, button spam prevention, etc.`,
-      difficulty: "medium",
-      tags: ["closure", "timing", "frontend"],
-    },
-    {
-      title: "LRU Cache",
-      description: `Implement an LRUCache class with a fixed capacity:
-- get(key)       → return value if key exists, else -1. Mark as recently used.
-- put(key, value) → insert or update. If at capacity, evict the least recently used item first.
-
-Example:
-  const cache = new LRUCache(2);
-  cache.put(1, 1);
-  cache.put(2, 2);
-  cache.get(1);    // returns 1
-  cache.put(3, 3); // evicts key 2
-  cache.get(2);    // returns -1 (evicted)
-  cache.get(3);    // returns 3`,
-      difficulty: "hard",
-      tags: ["data-structure", "hashmap", "linked-list"],
-    },
-    {
-      title: "Event Emitter",
-      description: `Implement an EventEmitter class with these methods:
-- on(event, listener)   → register a listener for an event
-- off(event, listener)  → remove a specific listener
-- emit(event, ...args)  → call all listeners for the event with the given args
-- once(event, listener) → listener fires only the first time the event is emitted, then auto-removes
-
-Example:
-  const emitter = new EventEmitter();
-  emitter.on("data", (x) => console.log(x));
-  emitter.emit("data", 42);  // logs 42
-  emitter.emit("data", 43);  // logs 43
-
-This is the core of Node.js's EventEmitter.`,
-      difficulty: "medium",
-      tags: ["class", "design-pattern", "nodejs"],
-    },
-    {
-      title: "Middleware Pipeline (Express-style)",
-      description: `Implement a compose(middlewares) function that takes an array of middleware functions and returns a single function. Each middleware has the signature (req, res, next) and must call next() to pass control to the next middleware.
-
-Example:
-  const m1 = (req, res, next) => { req.a = 1; next(); };
-  const m2 = (req, res, next) => { req.b = 2; next(); };
-  const m3 = (req, res, next) => { res.result = req.a + req.b; };
-
-  const run = compose([m1, m2, m3]);
-  const req = {}, res = {};
-  run(req, res);
-  console.log(res.result); // 3
-
-This is exactly how Express.js processes requests internally.`,
-      difficulty: "hard",
-      tags: ["nodejs", "express", "design-pattern"],
-    },
-    {
-      title: "Async Rate Limiter",
-      description: `Write a function createRateLimiter(maxCalls, windowMs) that returns a function limiter(fn). Calling limiter(fn) should execute fn only if fewer than maxCalls have been made in the last windowMs milliseconds. If the limit is exceeded, throw an error with the message "Rate limit exceeded".
-
-Example:
-  const limiter = createRateLimiter(3, 1000);
-  await limiter(() => fetch("/api/data"));  // ok
-  await limiter(() => fetch("/api/data"));  // ok
-  await limiter(() => fetch("/api/data"));  // ok
-  await limiter(() => fetch("/api/data"));  // throws "Rate limit exceeded"
-
-This is the logic behind API rate limiting in Express backends.`,
-      difficulty: "hard",
-      tags: ["async", "nodejs", "api"],
-    },
-    {
-      title: "JWT Payload Decoder",
-      description: `Write a function decodeJWT(token) that takes a JWT string (three Base64URL-encoded parts separated by dots) and returns the decoded payload as a JavaScript object. Do NOT verify the signature — only decode.
-
-Example:
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIxMjMiLCJyb2xlIjoiYWRtaW4ifQ.signature";
-  decodeJWT(token);
-  // { userId: "123", role: "admin" }
-
-Hint: The payload is the second segment. Base64URL differs from Base64 — handle the padding yourself.`,
-      difficulty: "medium",
-      tags: ["auth", "string", "nodejs"],
-    },
-    {
-      title: "MongoDB Aggregation Simulator",
-      description: `Implement a function aggregate(data, pipeline) that mimics a basic MongoDB aggregation pipeline on a plain JS array. Support these stages:
-- { $match: { field: value } }   → filter documents
-- { $group: { _id: "$field", total: { $sum: "$field2" } } }  → group and sum
-- { $sort: { field: 1 or -1 } }  → sort ascending (1) or descending (-1)
-
-Example:
-  const orders = [
-    { product: "A", amount: 10 },
-    { product: "B", amount: 20 },
-    { product: "A", amount: 30 },
+  const docs = [
+    { name: "Alice", age: 25 },
+    { name: "Bob",   age: 17 },
+    { name: "Carol", age: 30 },
   ];
-  aggregate(orders, [
-    { $match: { product: "A" } },
-    { $group: { _id: "$product", total: { $sum: "$amount" } } },
-  ]);
-  // [{ _id: "A", total: 40 }]`,
-      difficulty: "hard",
-      tags: ["mongodb", "array", "data-processing"],
-    },
-    {
-      title: "React useState Implementation",
-      description: `Implement a simplified version of React's useState hook called myUseState(initialValue). It should return a [value, setter] pair. Calling the setter with a new value should update the stored value, and calling the getter after that should return the new value. Multiple calls to myUseState must track their own independent state (use the concept of a call index / slot).
+  filterDocuments(docs, { age: { $gte: 18, $lt: 30 } });
+  // [{ name: "Alice", age: 25 }]
 
-Example:
-  const [count, setCount] = myUseState(0);
-  console.log(count());   // 0
-  setCount(5);
-  console.log(count());   // 5
-
-  const [name, setName] = myUseState("Alice");
-  console.log(name());    // "Alice"
-
-Note: count and name must be independent of each other.`,
-      difficulty: "hard",
-      tags: ["react", "closure", "hooks"],
-    },
-    {
-      title: "Currying Function",
-      description: `Write a function curry(fn) that converts any function with multiple arguments into a curried version. The curried function should keep returning functions until all required arguments have been provided, then execute and return the result.
-
-Example:
-  function add(a, b, c) { return a + b + c; }
-  const curriedAdd = curry(add);
-
-  curriedAdd(1)(2)(3);   // 6
-  curriedAdd(1, 2)(3);   // 6
-  curriedAdd(1)(2, 3);   // 6
-  curriedAdd(1, 2, 3);   // 6
-
-Hint: Use fn.length to know how many arguments are expected.`,
+  filterDocuments(docs, { name: { $ne: "Bob" } });
+  // [{ name: "Alice", age: 25 }, { name: "Carol", age: 30 }]`,
       difficulty: "medium",
-      tags: ["functional", "closure"],
+      tags: ["mongodb", "object", "logic"],
     },
     {
-      title: "Build a Simple Observable",
-      description: `Implement an Observable class similar to RxJS. It should support:
-- new Observable(subscribeFn)  → create an observable
-- subscribe({ next, error, complete })  → start listening
-- The subscribeFn receives an observer and can call observer.next(value), observer.error(err), or observer.complete()
+      title: "JWT Token Expiry Checker",
+      description: `Write a function isTokenExpired(token) that decodes a JWT (without verifying signature) and returns true if the token is expired, false otherwise. The payload contains an exp field which is a Unix timestamp in seconds.
 
 Example:
-  const obs = new Observable((observer) => {
-    observer.next(1);
-    observer.next(2);
-    observer.complete();
-  });
+  // token with exp = past timestamp
+  isTokenExpired("eyJ...pastToken...") // true
 
-  obs.subscribe({
-    next:     (v) => console.log("value:", v),
-    error:    (e) => console.log("error:", e),
-    complete: ()  => console.log("done"),
-  });
-  // value: 1
-  // value: 2
-  // done`,
+  // token with exp = future timestamp
+  isTokenExpired("eyJ...futureToken...") // false
+
+Hint: Compare exp * 1000 against Date.now(). Handle malformed tokens gracefully — return true if the token cannot be decoded.`,
+      difficulty: "medium",
+      tags: ["auth", "jwt", "nodejs"],
+    },
+    {
+      title: "Flatten Object to Dot Notation",
+      description: `Write a function flattenObject(obj) that takes a deeply nested object and returns a flat object where nested keys are represented using dot notation.
+
+Example:
+  Input:
+  {
+    user: {
+      name: "Alice",
+      address: {
+        city: "Delhi",
+        pin: 110001
+      }
+    },
+    active: true
+  }
+
+  Output:
+  {
+    "user.name": "Alice",
+    "user.address.city": "Delhi",
+    "user.address.pin": 110001,
+    "active": true
+  }`,
+      difficulty: "medium",
+      tags: ["object", "recursion", "logic"],
+    },
+    {
+      title: "Express Route Matcher",
+      description: `Write a function matchRoute(pattern, path) that checks whether a URL path matches a given Express-style route pattern. Support :param wildcards only (no regex, no *).
+
+Example:
+  matchRoute("/user/:id",          "/user/42")         // true
+  matchRoute("/user/:id/post/:pid", "/user/1/post/99") // true
+  matchRoute("/user/:id",          "/user/42/extra")   // false
+  matchRoute("/about",             "/about")           // true
+  matchRoute("/about",             "/contact")         // false`,
+      difficulty: "medium",
+      tags: ["nodejs", "express", "string", "logic"],
+    },
+    {
+      title: "Build a Simple In-Memory Cache with TTL",
+      description: `Implement a class TTLCache with the following methods:
+- set(key, value, ttlMs) → store value with a time-to-live in milliseconds
+- get(key)               → return value if it exists and has not expired, else return null
+- delete(key)            → manually remove a key
+
+Example:
+  const cache = new TTLCache();
+  cache.set("token", "abc123", 500); // expires in 500ms
+  cache.get("token");  // "abc123"
+
+  // after 500ms:
+  cache.get("token");  // null
+
+Note: Do not use setTimeout for expiry — check expiry lazily inside get().`,
+      difficulty: "medium",
+      tags: ["data-structure", "nodejs", "backend"],
+    },
+    {
+      title: "Retry Failed Async Function",
+      description: `Write a function withRetry(fn, retries, delayMs) that calls an async function fn. If it throws, retry up to retries more times, waiting delayMs milliseconds between each attempt. If all attempts fail, throw the last error.
+
+Example:
+  let attempts = 0;
+  const unstable = async () => {
+    attempts++;
+    if (attempts < 3) throw new Error("fail");
+    return "success";
+  };
+
+  const result = await withRetry(unstable, 3, 100);
+  console.log(result);   // "success"
+  console.log(attempts); // 3
+
+This pattern is used heavily in API clients and DB connection logic.`,
+      difficulty: "medium",
+      tags: ["async", "nodejs", "backend", "error-handling"],
+    },
+    {
+      title: "Detect Circular Reference in Object",
+      description: `Write a function hasCircularReference(obj) that returns true if the object contains a circular reference, false otherwise.
+
+Example:
+  const a = { name: "Alice" };
+  hasCircularReference(a); // false
+
+  const b = { name: "Bob" };
+  b.self = b;
+  hasCircularReference(b); // true
+
+  const c = { x: { y: {} } };
+  c.x.y.z = c.x;
+  hasCircularReference(c); // true
+
+Hint: Use a WeakSet to track visited objects during traversal.`,
+      difficulty: "medium",
+      tags: ["object", "recursion", "logic"],
+    },
+    {
+      title: "Role-Based Access Control (RBAC) Checker",
+      description: `Write a function canAccess(userRole, resource, action, policy) that checks if a given role is allowed to perform an action on a resource, based on a policy object.
+
+Example:
+  const policy = {
+    admin:  { users: ["read", "write", "delete"], posts: ["read", "write", "delete"] },
+    editor: { posts: ["read", "write"] },
+    viewer: { posts: ["read"] },
+  };
+
+  canAccess("admin",  "users", "delete", policy); // true
+  canAccess("editor", "posts", "write",  policy); // true
+  canAccess("viewer", "posts", "write",  policy); // false
+  canAccess("viewer", "users", "read",   policy); // false
+
+This is the core logic behind middleware like express-rbac.`,
+      difficulty: "medium",
+      tags: ["auth", "backend", "logic", "nodejs"],
+    },
+    {
+      title: "Build a Simple React Form Validator",
+      description: `Write a function validate(formData, rules) where rules is an object that maps field names to an array of validator functions. Each validator returns an error string if invalid, or null if valid. Return an object with field names mapped to their first error (or null if valid).
+
+Example:
+  const rules = {
+    email: [
+      v => (!v ? "Email is required" : null),
+      v => (!v.includes("@") ? "Invalid email" : null),
+    ],
+    password: [
+      v => (!v ? "Password is required" : null),
+      v => (v.length < 6 ? "Min 6 characters" : null),
+    ],
+  };
+
+  validate({ email: "bad", password: "123" }, rules);
+  // { email: "Invalid email", password: "Min 6 characters" }
+
+  validate({ email: "a@b.com", password: "secure1" }, rules);
+  // { email: null, password: null }`,
+      difficulty: "medium",
+      tags: ["react", "frontend", "logic", "validation"],
+    },
+    {
+      title: "Implement a Task Queue with Concurrency Limit",
+      description: `Write a function createTaskQueue(concurrency) that returns an object with an add(fn) method. Tasks added via add() are async functions. At most concurrency tasks should run simultaneously. Remaining tasks should wait and auto-start as slots free up.
+
+Example:
+  const queue = createTaskQueue(2);
+
+  const task = (id, ms) => () =>
+    new Promise(res => setTimeout(() => { console.log("done", id); res(); }, ms));
+
+  queue.add(task(1, 300)); // starts immediately
+  queue.add(task(2, 300)); // starts immediately
+  queue.add(task(3, 300)); // waits — slot taken
+  // Once task 1 or 2 finishes, task 3 starts automatically
+
+This is the core of tools like p-limit and worker pool managers.`,
       difficulty: "hard",
-      tags: ["design-pattern", "async", "frontend"],
+      tags: ["async", "nodejs", "concurrency", "backend"],
     },
   ];
 
